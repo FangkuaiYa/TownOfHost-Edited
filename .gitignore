@@ -1,13 +1,8 @@
 
-*.editorconfig
+/.vs
+/bin
+/obj
+/.editorconfig
 
-.vs/
-
-Export/
-TONX/obj/
-
-TONX/Properties/PublishProfiles/
-TONX/FodyWeavers.xsd
-
-*Sponsor.xlsx
-/Assets/~$Roles ID.xlsx
+FodyWeavers.xsd
+TOHE.sln
