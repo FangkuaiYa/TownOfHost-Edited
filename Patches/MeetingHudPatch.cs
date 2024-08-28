@@ -294,7 +294,8 @@ class CheckForEndVotingPatch
         if (CustomRolesHelper.RoleExist(CustomRoles.Bard))
         {
             Main.BardCreations++;
-            try { name = ModUpdater.Get("https://v1.hitokoto.cn/?encode=text"); }
+            //try { name = ModUpdater.Get("https://v1.hitokoto.cn/?encode=text"); }
+            try { name = "免费的馈赠往往标明了无形的价格。"; }
             catch { name = GetString("ByBardGetFailed"); }
             name += "\n\t\t——" + GetString("ByBard");
             goto EndOfSession;

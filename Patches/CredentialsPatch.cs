@@ -1,4 +1,5 @@
 using HarmonyLib;
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -34,7 +35,7 @@ internal class PingTrackerUpdatePatch
         if (Options.LowLoadMode.GetBool()) sb.Append("\r\n").Append(Utils.ColorString(Color.green, GetString("LowLoadMode")));
 
         var offset_x = 1.2f; //右端からのオフセット
-        if (HudManager.InstanceExists && HudManager._instance.Chat.ChatButton.active) offset_x += 0.8f; //チャットボタンがある場合の追加オフセット
+        if (HudManager.InstanceExists && HudManager._instance.Chat.chatButton.active) offset_x += 0.8f; //チャットボタンがある場合の追加オフセット
         if (FriendsListManager.InstanceExists && FriendsListManager._instance.FriendsListButton.Button.active) offset_x += 0.8f; //フレンドリストボタンがある場合の追加オフセット
         __instance.GetComponent<AspectPosition>().DistanceFromEdge = new Vector3(offset_x, 0f, 0f);
 
@@ -45,11 +46,28 @@ internal class PingTrackerUpdatePatch
 internal class VersionShowerStartPatch
 {
     public static GameObject OVersionShower;
-    private static TextMeshPro SpecialEventText;
     private static TextMeshPro VisitText;
-
     private static void Postfix(VersionShower __instance)
     {
+        string credentialsText = string.Format(GetString("MainMenuCredential"), $"<color={Main.ModColor}>两个萌新开发组</color>");
+        credentialsText += "\t\t\t";
+        string versionText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginVersion}";
+
+        credentialsText += versionText;
+
+        var friendCode = GameObject.Find("FriendCode");
+        if (friendCode != null && OVersionShower == null)
+        {
+            OVersionShower = Object.Instantiate(friendCode, friendCode.transform.parent);
+            OVersionShower.name = "TONX Version Shower";
+            OVersionShower.transform.localPosition = friendCode.transform.localPosition + new Vector3(3.2f, 0f, 0f);
+            OVersionShower.transform.localScale *= 1.7f;
+            var TMP = OVersionShower.GetComponent<TextMeshPro>();
+            TMP.alignment = TextAlignmentOptions.Right;
+            TMP.fontSize = 30f;
+            TMP.SetText(credentialsText);
+        }
+
 
         Main.credentialsText = $"\r\n<color={Main.ModColor}>{Main.ModName}</color> v{Main.PluginVersion}";
         if (Main.IsAprilFools) Main.credentialsText = $"\r\n<color=#00bfff>Town Of Host</color> v11.45.14";
@@ -69,146 +87,163 @@ internal class VersionShowerStartPatch
             Main.credentialsText += $"\n{additionalCredentials}";
         }
 #endif
-        var credentials = Object.Instantiate(__instance.text);
-        credentials.text = Main.credentialsText;
-        credentials.alignment = TMPro.TextAlignmentOptions.TopRight;
-        credentials.transform.position = new Vector3(4.6f, 3.2f, 0);
 
         ErrorText.Create(__instance.text);
         if (Main.hasArgumentException && ErrorText.Instance != null)
             ErrorText.Instance.AddError(ErrorCode.Main_DictionaryError);
+        if ((OVersionShower = GameObject.Find("VersionShower")) != null && VisitText == null)
+        {
+            VisitText = Object.Instantiate(__instance.text);
+            VisitText.name = "TOHE User Counter";
+            VisitText.alignment = TextAlignmentOptions.Left;
+            VisitText.text = /*ModUpdater.visit > 0
+                ? string.Format(GetString("TOHEVisitorCount"), Main.ModColor, ModUpdater.visit):*/
+            $"欢迎使用<color={Main.ModColor}>TownOfHost-Edited</color>";
+            VisitText.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+            VisitText.transform.localPosition = new Vector3(-3.92f, -2.9f, 0f);
+            VisitText.enabled = GameObject.Find("TOHE Background") != null;
 
-        if (SpecialEventText == null)
-        {
-            SpecialEventText = Object.Instantiate(__instance.text);
-            SpecialEventText.text = "";
-            SpecialEventText.color = Color.white;
-            SpecialEventText.fontSize += 2.5f;
-            SpecialEventText.alignment = TextAlignmentOptions.Top;
-            SpecialEventText.transform.position = new Vector3(0, 0.5f, 0);
-        }
-        SpecialEventText.enabled = TitleLogoPatch.amongUsLogo != null;
-        if (Main.IsInitialRelease)
-        {
-            SpecialEventText.text = $"Happy Birthday to {Main.ModName}!";
-            ColorUtility.TryParseHtmlString(Main.ModColor, out var col);
-            SpecialEventText.color = col;
-        }
-        else if (!Main.IsAprilFools)
-        {
-            SpecialEventText.text = $"{Main.MainMenuText}";
-            SpecialEventText.fontSize = 0.9f;
-            SpecialEventText.color = Color.white;
-            SpecialEventText.alignment = TextAlignmentOptions.TopRight;
-            SpecialEventText.transform.position = new Vector3(4.6f, 2.725f, 0);
-        }
+            __instance.text.alignment = TextAlignmentOptions.Left;
+            OVersionShower.transform.localPosition = new Vector3(-4.92f, -3.3f, 0f);
 
-        if ((OVersionShower = GameObject.Find("VersionShower")) != null && !Main.IsAprilFools)
-        {
-            OVersionShower.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
-            OVersionShower.transform.position = new Vector3(-5.3f, 2.9f, 0f);
-            if (TitleLogoPatch.amongUsLogo != null)
-            {
-                if (VisitText == null && ModUpdater.visit > 0)
-                {
-                    VisitText = Object.Instantiate(__instance.text);
-                    VisitText.text = string.Format(GetString("TOHEVisitorCount"), Main.ModColor, ModUpdater.visit);
-                    VisitText.color = Color.white;
-                    VisitText.fontSize = 1.2f;
-                    //VisitText.alignment = TMPro.TextAlignmentOptions.Top;
-                    OVersionShower.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
-                    VisitText.transform.position = new Vector3(-5.3f, 2.75f, 0f);
-                }
-            }
-        }
+            var ap1 = OVersionShower.GetComponent<AspectPosition>();
+            if (ap1 != null) Object.Destroy(ap1);
+            var ap2 = VisitText.GetComponent<AspectPosition>();
+            if (ap2 != null) Object.Destroy(ap2);
+        };
     }
 }
 
-[HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start))]
+[HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start)), HarmonyPriority(Priority.First)]
 internal class TitleLogoPatch
 {
+    public static GameObject ModStamp;
+    public static GameObject TOHE_Background;
     public static GameObject Ambience;
-    public static GameObject amongUsLogo;
-    public static GameObject PlayLocalButton;
-    public static GameObject PlayOnlineButton;
-    public static GameObject HowToPlayButton;
-    public static GameObject FreePlayButton;
-    public static GameObject BottomButtons;
-    public static GameObject LoadingHint;
+    public static GameObject Starfield;
+    public static GameObject LeftPanel;
+    public static GameObject RightPanel;
+    public static GameObject CloseRightButton;
+    public static GameObject Tint;
+    public static GameObject Sizer;
+    public static GameObject AULogo;
+    public static GameObject BottomButtonBounds;
+
+    public static Vector3 RightPanelOp;
 
     private static void Postfix(MainMenuManager __instance)
     {
-        if (Main.IsAprilFools)
+        GameObject.Find("BackgroundTexture")?.SetActive(MainMenuManagerPatch.ShowedBak);
+
+        if (!(ModStamp = GameObject.Find("ModStamp"))) return;
+        ModStamp.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+
+        TOHE_Background = new GameObject("TOHE Background");
+        TOHE_Background.transform.position = new Vector3(0, 0, 520f);
+        var bgRenderer = TOHE_Background.AddComponent<SpriteRenderer>();
+        bgRenderer.sprite = Utils.LoadSprite("TOHE.Resources.Images.TOHE-BG.jpg", 179f);
+
+        if (!(Ambience = GameObject.Find("Ambience"))) return;
+        if (!(Starfield = Ambience.transform.FindChild("starfield").gameObject)) return;
+        StarGen starGen = Starfield.GetComponent<StarGen>();
+        starGen.SetDirection(new Vector2(0, -2));
+        Starfield.transform.SetParent(TOHE_Background.transform);
+        Object.Destroy(Ambience);
+
+        if (!(LeftPanel = GameObject.Find("LeftPanel"))) return;
+        LeftPanel.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+        static void ResetParent(GameObject obj) => obj.transform.SetParent(LeftPanel.transform.parent);
+        LeftPanel.ForEachChild((Il2CppSystem.Action<GameObject>)ResetParent);
+        LeftPanel.SetActive(false);
+
+        Color shade = new(0f, 0f, 0f, 0f);
+        var standardActiveSprite = __instance.newsButton.activeSprites.GetComponent<SpriteRenderer>().sprite;
+        var minorActiveSprite = __instance.quitButton.activeSprites.GetComponent<SpriteRenderer>().sprite;
+
+        Dictionary<List<PassiveButton>, (Sprite, Color, Color, Color, Color)> mainButtons = new()
         {
-            if ((amongUsLogo = GameObject.Find("bannerLogo_AmongUs")) != null)
-            {
-                amongUsLogo.transform.localScale *= 0.4f;
-                amongUsLogo.transform.position += Vector3.up * 0.25f;
-            }
+            {new List<PassiveButton>() {__instance.playButton, __instance.inventoryButton, __instance.shopButton},
+                (standardActiveSprite, new(1f, 0.524f, 0.549f, 0.8f), shade, Color.white, Color.white) },
+            {new List<PassiveButton>() {__instance.newsButton, __instance.myAccountButton, __instance.settingsButton},
+                (minorActiveSprite, new(1f, 0.825f, 0.686f, 0.8f), shade, Color.white, Color.white) },
+            {new List<PassiveButton>() {__instance.creditsButton, __instance.quitButton},
+                (minorActiveSprite, new(0.526f, 1f, 0.792f, 0.8f), shade, Color.white, Color.white) },
+        };
 
-            var tohLogo = new GameObject("titleLogo_TOH");
-            tohLogo.transform.position = Vector3.up;
-            tohLogo.transform.localScale *= 1.2f;
-            var renderer = tohLogo.AddComponent<SpriteRenderer>();
-            renderer.sprite = Utils.LoadSprite("TOHE.Resources.Images.TownOfHost-Logo.png", 300f);
-
-            return;
+        void FormatButtonColor(PassiveButton button, Sprite borderType, Color inActiveColor, Color activeColor, Color inActiveTextColor, Color activeTextColor)
+        {
+            button.activeSprites.transform.FindChild("Shine")?.gameObject?.SetActive(false);
+            button.inactiveSprites.transform.FindChild("Shine")?.gameObject?.SetActive(false);
+            var activeRenderer = button.activeSprites.GetComponent<SpriteRenderer>();
+            var inActiveRenderer = button.inactiveSprites.GetComponent<SpriteRenderer>();
+            activeRenderer.sprite = minorActiveSprite;
+            inActiveRenderer.sprite = minorActiveSprite;
+            activeRenderer.color = activeColor.a == 0f ? new Color(inActiveColor.r, inActiveColor.g, inActiveColor.b, 1f) : activeColor;
+            inActiveRenderer.color = inActiveColor;
+            button.activeTextColor = activeTextColor;
+            button.inactiveTextColor = inActiveTextColor;
         }
 
-        if (Main.FastBoot.Value)
+        foreach (var kvp in mainButtons)
+            kvp.Key.Do(button => FormatButtonColor(button, kvp.Value.Item1, kvp.Value.Item2, kvp.Value.Item3, kvp.Value.Item4, kvp.Value.Item5));
+
+        GameObject.Find("Divider")?.SetActive(false);
+
+        if (!(RightPanel = GameObject.Find("RightPanel"))) return;
+        var rpap = RightPanel.GetComponent<AspectPosition>();
+        if (rpap) Object.Destroy(rpap);
+        RightPanelOp = RightPanel.transform.localPosition;
+        RightPanel.transform.localPosition = RightPanelOp + new Vector3(10f, 0f, 0f);
+        RightPanel.GetComponent<SpriteRenderer>().color = new(1f, 0.78f, 0.9f, 1f);
+
+        CloseRightButton = new GameObject("CloseRightPanelButton");
+        CloseRightButton.transform.SetParent(RightPanel.transform);
+        CloseRightButton.transform.localPosition = new Vector3(-4.78f, 1.3f, 1f);
+        CloseRightButton.transform.localScale = new(1f, 1f, 1f);
+        CloseRightButton.AddComponent<BoxCollider2D>().size = new(0.6f, 1.5f);
+        var closeRightSpriteRenderer = CloseRightButton.AddComponent<SpriteRenderer>();
+        closeRightSpriteRenderer.sprite = Utils.LoadSprite("TOHE.Resources.Images.RightPanelCloseButton.png", 100f);
+        closeRightSpriteRenderer.color = new(1f, 0.78f, 0.9f, 1f);
+        var closeRightPassiveButton = CloseRightButton.AddComponent<PassiveButton>();
+        closeRightPassiveButton.OnClick = new();
+        closeRightPassiveButton.OnClick.AddListener((System.Action)MainMenuManagerPatch.HideRightPanel);
+        closeRightPassiveButton.OnMouseOut = new();
+        closeRightPassiveButton.OnMouseOut.AddListener((System.Action)(() => closeRightSpriteRenderer.color = new(1f, 0.78f, 0.9f, 1f)));
+        closeRightPassiveButton.OnMouseOver = new();
+        closeRightPassiveButton.OnMouseOver.AddListener((System.Action)(() => closeRightSpriteRenderer.color = new(1f, 0.68f, 0.99f, 1f)));
+
+        Tint = __instance.screenTint.gameObject;
+        var ttap = Tint.GetComponent<AspectPosition>();
+        if (ttap) Object.Destroy(ttap);
+        Tint.transform.SetParent(RightPanel.transform);
+        Tint.transform.localPosition = new Vector3(-0.0824f, 0.0513f, Tint.transform.localPosition.z);
+        Tint.transform.localScale = new Vector3(1f, 1f, 1f);
+
+        if (!DebugModeManager.AmDebugger)
         {
-            LoadingHint = new GameObject("LoadingHint");
-            LoadingHint.transform.position = Vector3.down;
-            var LoadingHintText = LoadingHint.AddComponent<TextMeshPro>();
-            LoadingHintText.text = GetString("Loading");
-            LoadingHintText.alignment = TextAlignmentOptions.Center;
-            LoadingHintText.fontSize = 3f;
+            __instance.howToPlayButton.gameObject.SetActive(false);
+            __instance.howToPlayButton.transform.parent.Find("FreePlayButton").gameObject.SetActive(false);
         }
 
-        if ((amongUsLogo = GameObject.Find("bannerLogo_AmongUs")) != null)
+        var creditsScreen = __instance.creditsScreen;
+        if (creditsScreen)
         {
-            amongUsLogo.transform.localScale *= 0.4f;
-            amongUsLogo.transform.position += Vector3.up * 0.25f;
+            var csto = creditsScreen.GetComponent<TransitionOpen>();
+            if (csto) Object.Destroy(csto);
+            var closeButton = creditsScreen.transform.FindChild("CloseButton");
+            closeButton?.gameObject.SetActive(false);
         }
 
-        if ((PlayLocalButton = GameObject.Find("PlayLocalButton")) != null)
-        {
-            PlayLocalButton.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-            PlayLocalButton.transform.position = new Vector3(-0.76f, -2.1f, 0f);
-        }
+        if (!(Sizer = GameObject.Find("Sizer"))) return;
+        if (!(AULogo = GameObject.Find("LOGO-AU"))) return;
+        Sizer.transform.localPosition += new Vector3(0f, 0.12f, 0f);
+        AULogo.transform.localScale = new Vector3(0.66f, 0.67f, 1f);
+        AULogo.transform.position += new Vector3(0f, 0.1f, 0f);
+        var logoRenderer = AULogo.GetComponent<SpriteRenderer>();
+        logoRenderer.sprite = Utils.LoadSprite("TOHE.Resources.Images.TOHE-Logo.png");
 
-        if ((PlayOnlineButton = GameObject.Find("PlayOnlineButton")) != null)
-        {
-            PlayOnlineButton.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-            PlayOnlineButton.transform.position = new Vector3(0.725f, -2.1f, 0f);
-        }
-
-        if ((HowToPlayButton = GameObject.Find("HowToPlayButton")) != null)
-        {
-            HowToPlayButton.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-            HowToPlayButton.transform.position = new Vector3(-2.225f, -2.175f, 0f);
-        }
-
-        if ((FreePlayButton = GameObject.Find("FreePlayButton")) != null)
-        {
-            FreePlayButton.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-            FreePlayButton.transform.position = new Vector3(2.1941f, -2.175f, 0f);
-        }
-
-        if ((BottomButtons = GameObject.Find("BottomButtons")) != null)
-        {
-            BottomButtons.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
-            BottomButtons.transform.position = new Vector3(0f, -2.71f, 0f);
-        }
-
-        if ((Ambience = GameObject.Find("Ambience")) != null)
-        {
-            Ambience.SetActive(false);
-            var CustomBG = new GameObject("CustomBG");
-            CustomBG.transform.position = new Vector3(0, 0, 520f);
-            var bgRenderer = CustomBG.AddComponent<SpriteRenderer>();
-            bgRenderer.sprite = Utils.LoadSprite("TOHE.Resources.Images.TOHE-BG.jpg", 179f);
-        }
+        if (!(BottomButtonBounds = GameObject.Find("BottomButtonBounds"))) return;
+        BottomButtonBounds.transform.localPosition -= new Vector3(0f, 0.1f, 0f);
     }
 }
 [HarmonyPatch(typeof(ModManager), nameof(ModManager.LateUpdate))]
@@ -227,5 +262,14 @@ internal class ModManagerLateUpdatePatch
         __instance.ModStamp.transform.position = AspectPosition.ComputeWorldPosition(
             __instance.localCamera, AspectPosition.EdgeAlignments.RightTop,
             new Vector3(0.4f, offset_y, __instance.localCamera.nearClipPlane + 0.1f));
+    }
+}
+[HarmonyPatch(typeof(CreditsScreenPopUp))]
+internal class CreditsScreenPopUpPatch
+{
+    [HarmonyPatch(nameof(CreditsScreenPopUp.OnEnable))]
+    public static void Postfix(CreditsScreenPopUp __instance)
+    {
+        __instance.BackButton.transform.parent.FindChild("Background").gameObject.SetActive(false);
     }
 }

@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-
+using UnityEngine;
 namespace TOHE;
 
 public static class Translator
@@ -128,6 +128,29 @@ public static class Translator
             return SupportedLangs.English;
         }
     }
+    public static SupportedLangs GetUserLangByRegion()
+    {
+#if DEBUG
+        if (Environment.UserName == "Leever")
+            return SupportedLangs.SChinese;
+#endif
+        try
+        {
+            var name = CultureInfo.CurrentUICulture.Name;
+            if (name.StartsWith("en")) return SupportedLangs.English;
+            if (name.StartsWith("ru")) return SupportedLangs.Russian;
+            if (name.StartsWith("pt")) return SupportedLangs.Brazilian;
+            if (name.StartsWith("zh_CHT")) return SupportedLangs.TChinese;
+            if (name.StartsWith("zh")) return SupportedLangs.SChinese;
+            return TranslationController.Instance?.currentLanguage?.languageID ?? SupportedLangs.English;
+        }
+        catch
+        {
+            return SupportedLangs.English;
+        }
+    }
+
+    public static bool IsChineseUser => GetUserLangByRegion() == SupportedLangs.SChinese;
     public static void LoadCustomTranslation(string filename, SupportedLangs lang)
     {
         string path = @$"./{LANGUAGE_FOLDER_NAME}/{filename}";
@@ -177,4 +200,15 @@ public static class Translator
         }
         File.WriteAllText(@$"./{LANGUAGE_FOLDER_NAME}/export_{lang}.dat", sb.ToString());
     }
+    public static void DestroyTranslator(this GameObject obj)
+    {
+        if (obj == null) return;
+        obj.ForEachChild((Il2CppSystem.Action<GameObject>)DestroyTranslator);
+        TextTranslatorTMP[] translator = obj.GetComponentsInChildren<TextTranslatorTMP>(true);
+        translator?.Do(UnityEngine.Object.Destroy);
+    }
+    /// <summary>
+    /// オブジェクトの<see cref="TextTranslatorTMP"/>コンポーネントを破棄します
+    /// </summary>
+    public static void DestroyTranslator(this MonoBehaviour obj) => obj?.gameObject?.DestroyTranslator();
 }

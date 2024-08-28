@@ -40,11 +40,11 @@ public class GameStartManagerPatch
             if (!AmongUsClient.Instance.AmHost) return;
 
             // Make Public Button
-            if (ModUpdater.isBroken || (ModUpdater.hasUpdate && ModUpdater.forceUpdate) || !Main.AllowPublicRoom)
-            {
-                __instance.MakePublicButton.color = Palette.DisabledClear;
-                __instance.privatePublicText.color = Palette.DisabledClear;
-            }
+            //if (ModUpdater.isBroken || (ModUpdater.hasUpdate && ModUpdater.forceUpdate) || !Main.AllowPublicRoom)
+            //{
+            //    __instance.MakePublicButton.color = Palette.DisabledClear;
+            //    __instance.privatePublicText.color = Palette.DisabledClear;
+            //}
 
             if (Main.NormalOptions.KillCooldown == 0f)
                 Main.NormalOptions.KillCooldown = Main.LastKillCooldown.Value;

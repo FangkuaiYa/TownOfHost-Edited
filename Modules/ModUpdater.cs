@@ -17,7 +17,7 @@ namespace TOHE;
 [HarmonyPatch]
 public class ModUpdater
 {
-    private static readonly string URL_2018k = "http://api.2018k.cn";
+    /*private static readonly string URL_2018k = "http://api.2018k.cn";
     private static readonly string URL_Github = "https://api.github.com/repos/KARPED1EM/TownOfHostEdited";
     public static bool hasUpdate = false;
     public static bool forceUpdate = true;
@@ -333,8 +333,8 @@ public class ModUpdater
             {
                 File.Delete(savePath);
                 ShowPopup(GetString("downloadFailed"), StringNames.Okay, true, false);
-                MainMenuManagerPatch.updateButton.SetActive(true);
-                MainMenuManagerPatch.updateButton.transform.position = MainMenuManagerPatch.template.transform.position + new Vector3(0.25f, 0.75f);
+                MainMenuManagerPatch.UpdateButton.SetActive(true);
+                MainMenuManagerPatch.UpdateButton.transform.position = MainMenuManagerPatch.UpdateButton.transform.position + new Vector3(0.25f, 0.75f);
             }
             else
             {
@@ -404,5 +404,5 @@ public class ModUpdater
                 else button.GetComponent<PassiveButton>().OnClick.AddListener((Action)(() => InfoPopup.Close()));
             }
         }
-    }
+    }*/
 }

@@ -1,0 +1,11 @@
+#Number:100043
+#Title:TownOfHostEdited v2.3.6
+#SubTitle:★★★★This Day TOHE Stop Update★★★★
+#ShortTitle:★TOHE v2.3.6
+#Date:2023-5-20T00:00:00Z
+#-----------------------------
+TOHE Stop Update！
+
+
+## Base
+- Base on TOH v4.1.2

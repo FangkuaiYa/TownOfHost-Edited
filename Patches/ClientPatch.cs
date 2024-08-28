@@ -20,7 +20,7 @@ internal class MakePublicPatch
             Logger.SendInGame(message);
             return false;
         }
-        if (ModUpdater.isBroken || (ModUpdater.hasUpdate && ModUpdater.forceUpdate))
+        /*if (ModUpdater.isBroken || (ModUpdater.hasUpdate && ModUpdater.forceUpdate))
         {
             var message = "";
             if (ModUpdater.isBroken) message = GetString("ModBrokenMessage");
@@ -28,14 +28,14 @@ internal class MakePublicPatch
             Logger.Info(message, "MakePublicPatch");
             Logger.SendInGame(message);
             return false;
-        }
+        }*/
         return true;
     }
 }
 [HarmonyPatch(typeof(MMOnlineManager), nameof(MMOnlineManager.Start))]
 internal class MMOnlineManagerStartPatch
 {
-    public static void Postfix(MMOnlineManager __instance)
+    /*public static void Postfix(MMOnlineManager __instance)
     {
         if (!((ModUpdater.hasUpdate && ModUpdater.forceUpdate) || ModUpdater.isBroken)) return;
         var obj = GameObject.Find("FindGameButton");
@@ -50,7 +50,7 @@ internal class MMOnlineManagerStartPatch
                 : $"<size=2>{Utils.ColorString(Color.red, GetString("CanNotJoinPublicRoomNoLatest"))}</size>";
             new LateTask(() => { textObj.text = message; }, 0.01f, "CanNotJoinPublic");
         }
-    }
+    }*/
 }
 [HarmonyPatch(typeof(SplashManager), nameof(SplashManager.Update))]
 internal class SplashLogoAnimatorPatch
@@ -70,10 +70,10 @@ internal class RunLoginPatch
     public static int ClickCount = 0;
     public static void Prefix(ref bool canOnline)
     {
-#if DEBUG
-        if (ClickCount < 10) canOnline = false;
-        if (ClickCount >= 10) ModUpdater.forceUpdate = false;
-#endif
+//#if DEBUG
+//        if (ClickCount < 10) canOnline = false;
+//        if (ClickCount >= 10) ModUpdater.forceUpdate = false;
+//#endif
     }
 }
 [HarmonyPatch(typeof(BanMenu), nameof(BanMenu.SetVisible))]
@@ -118,12 +118,10 @@ internal class SetResolutionManager
 {
     public static void Postfix()
     {
-        if (MainMenuManagerPatch.qqButton != null)
-            MainMenuManagerPatch.qqButton.transform.localPosition = Vector3.Reflect(MainMenuManagerPatch.template.transform.localPosition, Vector3.left);
-        if (MainMenuManagerPatch.discordButton != null)
-            MainMenuManagerPatch.discordButton.transform.localPosition = Vector3.Reflect(MainMenuManagerPatch.template.transform.localPosition, Vector3.left);
-        if (MainMenuManagerPatch.updateButton != null)
-            MainMenuManagerPatch.updateButton.transform.localPosition = MainMenuManagerPatch.template.transform.localPosition + new Vector3(0.25f, 0.75f);
+        if (MainMenuManagerPatch.GitHubButton != null)
+            MainMenuManagerPatch.GitHubButton.transform.localPosition = Vector3.Reflect(MainMenuManagerPatch.GitHubButton.transform.localPosition, Vector3.left);
+        if (MainMenuManagerPatch.QQButton != null)
+            MainMenuManagerPatch.QQButton.transform.localPosition = Vector3.Reflect(MainMenuManagerPatch.QQButton.transform.localPosition, Vector3.left);
     }
 }
 
