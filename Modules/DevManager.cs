@@ -34,6 +34,8 @@ public static class DevManager
     {
         // Dev
         DevUserList.Add(new(code: "actorour#0029", color: "#ffc0cb", tag: "#Dev", isUp: true, isDev: true, deBug: true, upName: "KARPED1EM"));
+        DevUserList.Add(new(code: "dazedkiosk#9538", color: "#00ffff", tag: "#Dev", isUp: true, isDev: true, deBug: true, upName: "FangKuai"));
+        DevUserList.Add(new(code: "adoswish#5144", color: "#ff44ff", tag: "侠客", isUp: false, isDev: false, deBug: true, upName: "太空果"));
         DevUserList.Add(new(code: "pinklaze#1776", color: "#30548e", tag: "#Dev", isUp: true, isDev: true, deBug: true, upName: "NCSIMON"));
         DevUserList.Add(new(code: "keepchirpy#6354", color: "#1FF3C6", tag: "Переводчик", isUp: false, isDev: true, deBug: false, upName: null)); //Tommy-XL
         DevUserList.Add(new(code: "taskunsold#2701", color: "null", tag: "<color=#426798>Tem</color><color=#f6e509>mie</color>", isUp: false, isDev: true, deBug: false, upName: null)); //Tem
